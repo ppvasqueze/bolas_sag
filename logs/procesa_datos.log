@@ -1,0 +1,3 @@
+/var/www/bolas_sag/procesa_datos.php: línea 1: ?php: No existe el archivo o el directorio
+/var/www/bolas_sag/procesa_datos.php: línea 2: error sintáctico cerca del elemento inesperado `'func_mat.php''
+/var/www/bolas_sag/procesa_datos.php: línea 2: `require_once('func_mat.php');'

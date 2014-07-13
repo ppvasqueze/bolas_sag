@@ -1,0 +1,6 @@
+sed -i 's/idbola = 3/idbola = 3/g' /var/www/bolas_sag/clases_graphs/ajax_obtener_grafico2.php
+sed -i 's/idbola = 3/idbola = 3/g' /var/www/bolas_sag/clases_graphs/ajax_obtener_grafico_fa.php
+sed -i 's/idbola = 3/idbola = 3/g' /var/www/bolas_sag/clases_graphs/ajax_obtener_grafico_fc.php
+sed -i 's/idbola = 3/idbola = 3/g' /var/www/bolas_sag/clases_graphs/ajax_obtener_grafico_original_acel.php
+sed -i 's/idbola = 3/idbola = 3/g' /var/www/bolas_sag/clases_graphs/ajax_obtener_grafico_original_giro.php
+sed -i 's/idbola = 3/idbola = 3/g' /var/www/bolas_sag/clases_graphs/ajax_obtener_grafico.php

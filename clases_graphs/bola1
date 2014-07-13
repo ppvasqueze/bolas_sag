@@ -1,0 +1,5 @@
+cp /var/www/bolas_sag/clases_graphs/originales/*.php /var/www/bolas_sag/clases_graphs/
+ls *.php|awk -F ' ' '{print "sed -i \47s/idbola = 3/idbola = 1/g\47 /var/www/bolas_sag/clases_graphs/" $0 }' > /var/www/bolas_sag/clases_graphs/cambio
+chmod 777 /var/www/bolas_sag/clases_graphs/cambio
+/var/www/bolas_sag/clases_graphs/cambio
+cp /var/www/bolas_sag/clases_graphs/*.php /var/www/bolas_sag/
