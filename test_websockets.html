@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+</head>
+<body>
+
+<Input type="text" name="cadena" id="cadena" />
+
+<Script>
+	var connection = new WebSocket('ws://html5rocks.websocket.org/echo', ['soap', 'xmpp']);
+
+	// When the connection is open, send some data to the server
+	connection.onopen = function () {
+	  connection.send('Ping'); // Send the message 'Ping' to the server
+	};
+
+	// Log errors
+	connection.onerror = function (error) {
+	  //console.log('WebSocket Error ' + error);
+	  alert('WebSocket Error ' + error);
+	};
+
+	connection.onclose = function (reason){
+	  alert('Closed' + reason);
+	};
+
+	// Log messages from the server
+	connection.onmessage = function (e) {
+	  console.log('Server: ' + e.data);
+	  alert('Server: ' + e.data)
+	};
+</Script>
+
+</body>
+</html>
+
