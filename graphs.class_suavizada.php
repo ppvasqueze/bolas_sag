@@ -50,14 +50,19 @@ class create_3d_graphs {
 	}
 	
 	public function crear_grafico(){
+		$debug = true;
+		$nl = "\n";
 		
+		
+		if ($debug) echo "paso 1" . $nl;
 		$mPernosBolas = $this->get_pernos_bolas();
 		if (is_array($mPernosBolas)){
-			
+			if ($debug) echo "paso 2". $nl;
 			$fecha = date("Ymd");
 			$hora = date("Hisu");
 			$sufix_file = $fecha . $hora;
 			for ($i=0; $i < count($mPernosBolas); $i++){
+				if ($debug) echo "paso 3". $nl;
 				$idperno = $mPernosBolas[$i][0];
 				$idbola = $mPernosBolas[$i][1];
 				$this->get_limites();
@@ -66,6 +71,7 @@ class create_3d_graphs {
 				$vector = "aceleracion";
 				$data = $this->get_data($idperno, $idbola, $vector);
 				if (is_array($data) && count($data) > 0){
+					if ($debug) echo "paso 4". $nl;
 					//print "graficando a \n";
 					$this->set_vector_limits($vector);
 					$filename = $vector . "_" . $idperno . "_" . $idbola . "_" . $sufix_file . ".png"; 
@@ -79,6 +85,7 @@ class create_3d_graphs {
 				$data = $this->get_data($idperno, $idbola, $vector);
 				
 				if (is_array($data) && count($data) > 0){
+					if ($debug) echo "paso 5". $nl;
 					//print "graficando p \n";
 					echo "chaoooooooo";
 					$this->set_vector_limits($vector);
@@ -92,6 +99,7 @@ class create_3d_graphs {
 				$vector = "fcom";
 				$data = $this->get_data($idperno, $idbola, $vector);
 				if (is_array($data) && count($data) > 0){
+					if ($debug) echo "paso 6". $nl;
 					//print "graficando p \n";
 					$this->set_vector_limits($vector);
 					$filename = $vector . "_" . $idperno . "_" . $idbola . "_" . $sufix_file . ".png"; 
@@ -104,6 +112,7 @@ class create_3d_graphs {
 				$vector = "fabr";
 				$data = $this->get_data($idperno, $idbola, $vector);
 				if (is_array($data) && count($data) > 0){
+					if ($debug) echo "paso 7". $nl;
 					//print "graficando p \n";
 					$this->set_vector_limits($vector);
 					$filename = $vector . "_" . $idperno . "_" . $idbola . "_" . $sufix_file . ".png"; 
@@ -197,7 +206,6 @@ class create_3d_graphs {
        }
 
 
-	
 	private function get_data($idperno, $idbola, $vector){
 		//$sql = "select ai, an, ri, rn, mn, mf, fci, fcn, fai, fan from parametro where id_reg >= 18500 ";
 		$graficar = false;
@@ -209,18 +217,19 @@ class create_3d_graphs {
 				$pHora = 4;
 				$tiene_params = $this->get_param_proceso("ai,an", $idbola);
 				$sql = "select id_reg, ax, ay, az ";
-				$sql .= ",(Select hora from parametros_mem where idregistro = id_reg) as hora ";
+				$sql .= ",(Select hora from parametros_mem where idregistro = id_log) as hora ";
 				$sql .= " from parametro where id_reg >= " . $this->params_lectura["inicio"];
 				$sql .= " and ax <> 0 and ay <> 0 and az <> 0 ";
 				$sql .= " and id_bola = " . $idbola . " ";
 				$sql .= " order by id_reg ";
 				$sql .= " limit " . $this->params_lectura["muestra_cantidad"];
+				//echo $sql . "\n";
 			break;
 			case "posicion":
 				$pHora = 4;
 				$tiene_params = $this->get_param_proceso("ri,rn", $idbola);
 				$sql = "select id_reg, rx, ry, rz ";
-				$sql .= ",(Select hora from parametros_mem where idregistro = id_reg) as hora ";
+				$sql .= ",(Select hora from parametros_mem where idregistro = id_log) as hora ";
 				$sql .= "from parametro where id_reg >= " . $this->params_lectura["inicio"];
 				$sql .= " and rx <> 0 and ry <> 0 and rz <> 0 ";
 				$sql .= " and id_bola = " . $idbola . " ";
@@ -231,7 +240,7 @@ class create_3d_graphs {
 				$pHora = 2;
 				$tiene_params = $this->get_param_proceso("fci,fcn", $idbola);
 				$sql = "select id_reg, Fcom ";
-				$sql .= ",(Select hora from parametros_mem where idregistro = id_reg) as hora ";
+				$sql .= ",(Select hora from parametros_mem where idregistro = id_log) as hora ";
 				$sql .= "from parametro where id_reg >= " . $this->params_lectura["inicio"];
 				$sql .= " and Fcom <> 0 ";
 				$sql .= " and id_bola = " . $idbola . " ";
@@ -242,7 +251,7 @@ class create_3d_graphs {
 				$pHora = 2;
 				$tiene_params = $this->get_param_proceso("fai,fan", $idbola);
 				$sql = "select id_reg, Fabr ";
-				$sql .= ",(Select hora from parametros_mem where idregistro = id_reg) as hora ";
+				$sql .= ",(Select hora from parametros_mem where idregistro = id_log) as hora ";
 				$sql .= " from parametro where id_reg >= " . $this->params_lectura["inicio"];
 				$sql .= " and Fabr <> 0 ";
 				$sql .= " and id_bola = " . $idbola . " ";
@@ -374,7 +383,7 @@ class create_3d_graphs {
 	private function create_cfg_file($vector, $file){
 		$nl = "\n";
 		//$data  = "set terminal png transparent nocrop enhanced font sanz 10 size " . $this->width . "," . $this->height . $nl;
-		$data  = "set terminal png nocrop enhanced font \"/usr/share/fonts/truetype/msttcorefonts/Arial.ttf\" 18 size " . $this->width . "," . $this->height . $nl;
+		$data  = "set terminal png nocrop enhanced font \"/usr/share/fonts/truetype/msttcorefonts/Arial.ttf\" 10 size " . $this->width . "," . $this->height . $nl;
 		$data .= "set output '" . $file . "'" . $nl;
 		$data .= "set dummy u,v" . $nl;
 		//$data .= "set key inside right top vertical Right noreverse enhanced autotitles box linetype -1 linewidth 1.000" . $nl;
@@ -401,7 +410,7 @@ class create_3d_graphs {
 	
 	private function create_cfg_file_2d($vector, $file){
 		$nl = "\n";
-		$data  = "set terminal png nocrop enhanced font \"/usr/share/fonts/truetype/msttcorefonts/Arial.ttf\" 18 size " . $this->width . "," . $this->height . $nl;
+		$data  = "set terminal png nocrop enhanced font \"/usr/share/fonts/truetype/msttcorefonts/Arial.ttf\" 10 size " . $this->width . "," . $this->height . $nl;
 		$data .= "set output '" . $file . "'" . $nl;
 		$data .= "set dummy u,v" . $nl;
 		$data .= "set nokey" . $nl;

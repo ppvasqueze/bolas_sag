@@ -1,6 +1,6 @@
 #!/usr/bin/php -q
 <?
-echo "holaaaaaaaaaaaaaaaaaaa";	
+echo "holaaaaaaaaaaaaaaaaaaa\n";
 require_once('graphs.class_suavizada.php');
 
 $g = new create_3d_graphs;

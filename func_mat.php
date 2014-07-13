@@ -42,7 +42,7 @@ function area_2puntos($x1, $y1, $x2, $y2)
 		//Calculamos el area del primer triangulo
 		$tri1=($y1*$tg_alfa)/2;
 		//Calculamos el area del triangulo 2
-		$tri2=($y2*tg_alfa)/2;
+		$tri2=($y2*$tg_alfa)/2;
 		//Como la tangente es siempre ositiva en estos caso, el signo vien dado por el valor de Y
 		//El area sera la suma simple, ya que el signo viene dentro del valor de cada sub area
 		$AREA=$tri1+$tri2;

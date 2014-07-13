@@ -3,13 +3,18 @@
 require_once('func_mat.php');
 require_once('Conecciones/Conecciones.php');
 
+$global=new Conecciones();
+$DB=$global->db_local_v1;
+$status=$DB->Conectar("bolas_sag");
+
+
 while (true)
 {
-	procesa();
+	procesa($DB);
 	//sleep(2);
 }
 
-function procesa()
+function procesa($DB)
 {
 	/* Estadosstatus=0 
 	0	-> Nuevo
@@ -30,9 +35,6 @@ function procesa()
 	$PI=pi();
 	
 	
-	$global=new Conecciones();
-	$DB=$global->db_local_v1;
-	$status=$DB->Conectar("bolas_sag");
 	//Obtenemos un id para procesar
 	/*$sql="
 
@@ -100,7 +102,7 @@ function procesa()
 	if ($ERROR==true)
 	{
 		$estado_futuro=-1;
-		graba_estado($ID, $estado_futuro);
+		graba_estado($DB, $ID, $estado_futuro);
 		return false;
 	}
 	
@@ -335,23 +337,25 @@ function procesa()
 		//echo $sql;
 		$resultado=$DB->consultaSQL($sql, false);
 		$estado_futuro=2;
-		graba_estado($ID, $estado_futuro);
+		graba_estado($DB, $ID, $estado_futuro);
 		return true;
 	}
 	else
 	{
 		$estado_futuro=-1;
-		graba_estado($ID, $estado_futuro);
+		graba_estado($DB, $ID, $estado_futuro);
 		return false;
 	}
 
 }
 
-function graba_estado($id_reg, $estado_futuro)
+function graba_estado($DB, $id_reg, $estado_futuro)
 {
+	/*
 	$global=new Conecciones();
 	$DB=$global->db_local_v1;
 	$status=$DB->Conectar("bolas_sag");
+	*/
 	$sql="UPDATE parametros_mem SET status=".$estado_futuro." WHERE idregistro=".$id_reg;
 	$resultado=$DB->consultaSQL($sql, false);
 	echo "Registro procesado ".$id_reg."\n";
