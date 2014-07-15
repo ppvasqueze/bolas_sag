@@ -1,6 +1,3 @@
 Conecciones/Conecciones.php
-clean_data.sh
-./graficos/
+./clean_data.sh
 ./log/
-./logs/
-

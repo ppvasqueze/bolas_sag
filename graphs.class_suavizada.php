@@ -1,4 +1,6 @@
 <?
+require_once('socketClient.php');
+
 class create_3d_graphs {
 	public $num_datos_muestra = 10;
 	public $vector_muestra = 'aceleracion'; // aceleracion o giro
@@ -12,6 +14,7 @@ class create_3d_graphs {
 	private $mLimiteVector = "";
 	private $params_lectura = "";
 	private $mHorasGrafs = "";
+	private $SocketCnx = "";
 	
 	public function __construct(){
 		$PATH_BASE='/var/www/bolas_sag/Conecciones/';
@@ -28,7 +31,10 @@ class create_3d_graphs {
 
 		$this->mHorasGrafs["hora_ini"] = "";
 		$this->mHorasGrafs["hora_ter"] = "";
-		
+
+		echo "voy a crear un cliente socket\n";
+		$this->SocketCnx = new socketClient("127.0.0.1", 9001);
+
 		//$sql = "update graficados set ai=1, an=0, ri=1, rn=0, fci=1, fcn=0, fai=1, fan=0;";
 		//$this->db->consultaSQL($sql, false);
 		//$this->prefijo_archivo($this->vector_muestra);
@@ -50,7 +56,7 @@ class create_3d_graphs {
 	}
 	
 	public function crear_grafico(){
-		$debug = true;
+		$debug = false;
 		$nl = "\n";
 		
 		
@@ -76,9 +82,15 @@ class create_3d_graphs {
 					$this->set_vector_limits($vector);
 					$filename = $vector . "_" . $idperno . "_" . $idbola . "_" . $sufix_file . ".png"; 
 					$cfgfile = $this->create_cfg_file($vector, $this->ruta . $filename);
-					$this->create_data_file($data, $vector);
-					exec("/usr/bin/gnuplot " . $cfgfile, $msalida);
-					$this->informar_archivo($filename, $fecha, $hora, $vector, $idbola);
+					$generarGrafico = $this->create_data_file($data, $vector);
+					if ( $generarGrafico == true ) {
+						exec("/usr/bin/gnuplot " . $cfgfile, $msalida, $resultGnuPlot);
+						if ( $resultGnuPlot != 0){
+							echo $resultGnuPlot . "\n";
+							print_r($msalida);
+						}	
+						$this->informar_archivo($filename, $fecha, $hora, $vector, $idbola);
+					}	
 				}	
 				// CREANDO GRAFICO DE POSICION
 				$vector = "posicion";
@@ -87,13 +99,15 @@ class create_3d_graphs {
 				if (is_array($data) && count($data) > 0){
 					if ($debug) echo "paso 5". $nl;
 					//print "graficando p \n";
-					echo "chaoooooooo";
+					//echo "chaoooooooo";
 					$this->set_vector_limits($vector);
 					$filename = $vector . "_" . $idperno . "_" . $idbola . "_" . $sufix_file . ".png"; 
 					$cfgfile = $this->create_cfg_file($vector, $this->ruta . $filename);
-					$this->create_data_file($data, $vector);
-					exec("/usr/bin/gnuplot " . $cfgfile, $msalida);
-					$this->informar_archivo($filename, $fecha, $hora, $vector, $idbola);
+					$generarGrafico = $this->create_data_file($data, $vector);
+					if ( $generarGrafico == true ) {
+						exec("/usr/bin/gnuplot " . $cfgfile, $msalida);
+						$this->informar_archivo($filename, $fecha, $hora, $vector, $idbola);
+					}	
 				}
 				// CREANDO GRAFICO DE Fcom
 				$vector = "fcom";
@@ -104,9 +118,11 @@ class create_3d_graphs {
 					$this->set_vector_limits($vector);
 					$filename = $vector . "_" . $idperno . "_" . $idbola . "_" . $sufix_file . ".png"; 
 					$cfgfile = $this->create_cfg_file_2d($vector, $this->ruta . $filename);
-					$this->create_data_file($data, $vector);
-					exec("/usr/bin/gnuplot " . $cfgfile, $msalida);
-					$this->informar_archivo($filename, $fecha, $hora, $vector, $idbola);
+					$generarGrafico = $this->create_data_file($data, $vector);
+					if ( $generarGrafico == true ) {
+						exec("/usr/bin/gnuplot " . $cfgfile, $msalida);
+						$this->informar_archivo($filename, $fecha, $hora, $vector, $idbola);
+					}	
 				}
 				// CREANDO GRAFICO DE Fabr
 				$vector = "fabr";
@@ -117,9 +133,11 @@ class create_3d_graphs {
 					$this->set_vector_limits($vector);
 					$filename = $vector . "_" . $idperno . "_" . $idbola . "_" . $sufix_file . ".png"; 
 					$cfgfile = $this->create_cfg_file_2d($vector, $this->ruta . $filename);
-					$this->create_data_file($data, $vector);
-					exec("/usr/bin/gnuplot " . $cfgfile, $msalida);
-					$this->informar_archivo($filename, $fecha, $hora, $vector, $idbola);
+					$generarGrafico = $this->create_data_file($data, $vector);
+					if ( $generarGrafico == true ) {
+						exec("/usr/bin/gnuplot " . $cfgfile, $msalida);
+						$this->informar_archivo($filename, $fecha, $hora, $vector, $idbola);
+					}	
 				}
 			}
 		}
@@ -194,6 +212,15 @@ class create_3d_graphs {
 
 
 	 private function informar_archivo($archivo, $fecha, $hora, $vector, $idbola){
+	 
+		if ( $this->SocketCnx->isConnected() == true ){
+			$enviar = '{"grafico":"' . $this->grafico_vector($vector) . '","archivo":"' . $archivo . '"}';
+			//echo "enviando datos " . $enviar . "\n";
+			$this->SocketCnx->send($enviar);
+		}
+		
+		
+	 
                $sqlq = "INSERT INTO archivos_graficos (ruta, archivo, status, fecha, hora, vector, idbola) VALUES (";
                $sqlq .= "'" . $this->ruta . "'";
                $sqlq .= ",'" . $archivo . "'";
@@ -360,7 +387,27 @@ class create_3d_graphs {
 		return $resultado;
 	}
 	
-	
+
+	private function grafico_vector($vector){
+		$res = "";
+		switch ($vector){
+			case "aceleracion":
+				$res = "ga";
+			break;
+			case "posicion":
+				$res = "gp";
+			break;
+			case "fcom":
+				$res = "gfc";
+			break;
+			case "fabr":
+				$res = "gfa";
+			break;
+		}
+		return $res;
+	}
+
+
 	private function nombre_vector($vector){
 		$res = "";
 		switch ($vector){
@@ -443,8 +490,10 @@ class create_3d_graphs {
 		$fd = "\t";
 		$rd = "\n";
 		$data = "";
+		$hayData = false;
 		if (is_array($mdata)){
 			//print_r($mdata);
+			$hayData = true;
 			if ($vector == "aceleracion"){
 				for ($i=0; $i < count($mdata); $i++){
 					$data .= $mdata[$i][1] . $fd . $mdata[$i][2] . $fd . $mdata[$i][3] . $rd;
@@ -467,6 +516,7 @@ class create_3d_graphs {
 			}
 			$this->create_file($this->ruta . "graphic_" . $vector . ".dat", $data);	
 		}
+		return $hayData;
 	}
 
 

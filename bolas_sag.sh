@@ -5,12 +5,13 @@
 #
 
 #ejemplo OF=/var/my-backup-$(date +%Y%m%d).tgz
-#BASE="/home/juca/desarrollo/matrix/bolas/version_corregida_2014"
 BASE="/var/www/bolas_sag"
 RETVAL=0
 
 
 start () {
+	#El proxysws.py debe ser el primero en ser llamado y el ultimo en ser bajado
+	$BASE/websocket/proxysws.py start
 #	$BASE/read_data_bolas_sag > $BASE/logs/read_data_bolas_sag.log 2>&1 &
 #	$BASE/mem_to_db > $BASE/logs/mem_to_db.log 2>&1 &
 	$BASE/procesa_datos_prueba_cimm.php > $BASE/logs/procesa_datos_pruebas_cimm.log 2>&1 &
@@ -22,6 +23,7 @@ stop () {
 #	killall -9 mem_to_db
 	killall -9 procesa_datos_prueba_cimm.php
 	killall -9 generate_graphs_suavizado.php
+        $BASE/websocket/proxysws.py stop
 }
 
 case "$1" in

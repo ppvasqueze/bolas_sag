@@ -1,0 +1,81 @@
+<HTML>
+<HEAD>
+		<script type="text/javascript" src="prototype.js"></script>
+</HEAD>
+
+<BODY onload="init()">
+
+<table border=0>
+	<tr>
+		<Td><img name="ga" id="ga" src="images/grafico_blanco.png"  width="512" height="384"></td>
+		<Td><img name="gp" id="gp" src="images/grafico_blanco.png"  width="512" height="384"></td>
+		<Td>
+			Server status <img name="wsStatusIcon" id="wsStatusIcon" src="images/Disconnected.png">
+			<button onclick="quit()">Quit</button>
+		</TD>
+	</tr>
+	<tr>
+		<td><div id="gaArch"></div></td>
+		<td><div id="gpArch"></div></td>
+	</tr>
+	<tr>
+		<Td><img name="gfc" id="gfc" src="images/grafico_blanco.png"  width="512" height="384"></td>
+		<Td><img name="gfa" id="gfa" src="images/grafico_blanco.png"  width="512" height="384"></td> 
+	</tr>
+	<tr>
+		<td><div id="gfcArch"></div></td>
+		<td><div id="gfaArch"></div></td>
+	</tr>
+</table>
+
+
+
+
+
+</BODY>
+
+</HTML>
+
+
+
+<Script language="javascript">
+
+	var socket;
+	
+	function log(graf, msg){ $(graf + "Arch").innerHTML=msg; }
+
+	function init() {
+		var host = "ws://127.0.0.1:9000/proxychannel"; // SET THIS TO YOUR SERVER
+		try {
+			socket = new WebSocket(host);
+			//log('WebSocket - status '+socket.readyState);
+			socket.onopen    = function(msg) { 
+							$("wsStatusIcon").src = "images/Connected.png" 
+							console.log('Server connected: ' + this.readyState);
+						   };
+			socket.onmessage = function(msg) { 
+							//console.log("Received: "+msg.data); 
+							obj = JSON.parse(msg.data);
+							archivo = obj.archivo;
+							grafico = obj.grafico;
+							$(grafico).src = "graficos/" + archivo;
+							log(grafico, archivo);
+						   };
+			socket.onclose   = function(msg) { 
+							$("wsStatusIcon").src = "images/Disconnected.png" 
+							console.log("Disconnected - status "+this.readyState); 
+						   };
+		}
+		catch(ex){ 
+			log(ex); 
+		}
+		//$("msg").focus();
+	}
+	
+	function quit(){
+		if (socket != null) {
+			socket.close();
+			socket=null;
+		}
+	}	
+</Script>
